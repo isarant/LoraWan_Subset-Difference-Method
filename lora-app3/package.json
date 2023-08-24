@@ -1,0 +1,42 @@
+{
+  "name": "lora-app3",
+  "version": "0.1.0",
+  "private": true,
+  "proxy": "http://163.172.162.0",
+  "dependencies": {
+    "axios": "^0.15.3",
+    "bootstrap": "^4.3.1",
+    "formik": "^1.5.2",
+    "prop-types": "^15.7.2",
+    "react": "^16.8.6",
+    "react-axios": "^2.0.3",
+    "react-bootstrap": "^1.0.0-beta.8",
+    "react-dom": "^16.8.6",
+    "react-icons": "^3.5.0",
+    "react-redux": "^7.0.1",
+    "react-scripts": "2.1.8",
+    "react-websocket": "^2.0.1",
+    "redux": "^4.0.1",
+    "redux-persist": "^5.10.0",
+    "redux-thunk": "^2.3.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {
+    "enzyme": "^3.9.0",
+    "enzyme-adapter-react-16": "^1.11.2"
+  }
+}
