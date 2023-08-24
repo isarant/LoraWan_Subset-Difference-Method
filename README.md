@@ -1,4 +1,4 @@
-# LoraWan_Subset-Difference-Method
+# LoraWan Chat and multicast with Subset-Difference-Method
 We are proposed and developed the architecture and the basic components
 of an alternate comunication system in crisis situations.This system is useful when
 other comunication systems have crashed. Our proposals and architecture are use-
