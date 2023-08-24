@@ -1,0 +1,146 @@
+/**
+ * Copyright (c) 2017, Arm Limited and affiliates.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include <stdio.h>
+#include "events/EventQueue.h"
+
+
+
+
+#include "L.h"
+#include "mbed-memory-status/mbed_memory_status.h"
+#include "SerialBluetooth.h"
+
+using namespace std;
+using namespace events;
+
+//InterruptIn button(USER_BUTTON);
+//DigitalOut led(LED1);
+static EventQueue queue(MAX_NUMBER_OF_EVENTS *EVENTS_EVENT_SIZE);
+
+
+
+int main(void)
+{
+    // setup tracing
+
+    // stores the status of a call to LoRaWAN protocol
+    lorawan_status_t retcode;
+
+    // Initialize LoRaWAN stack
+    if (lorawan.initialize(&ev_queue) != LORAWAN_STATUS_OK) {
+        printf("\r\n LoRa initialization failed! \r\n");
+        return -1;
+    }
+
+    printf("\r\n Mbed LoRaWANStack initialized \r\n");
+
+    // prepare application callbacks
+    callbacks.events = mbed::callback(lora_event_handler);
+    lorawan.add_app_callbacks(&callbacks);
+
+    // Set number of retries in case of CONFIRMED messages
+    if (lorawan.set_confirmed_msg_retries(CONFIRMED_MSG_RETRY_COUNTER)
+            != LORAWAN_STATUS_OK) {
+        printf("\r\n set_confirmed_msg_retries failed! \r\n\r\n");
+        return -1;
+    }
+
+    printf("\r\n CONFIRMED message retries : %d \r\n",
+           CONFIRMED_MSG_RETRY_COUNTER);
+
+    // Enable adaptive data rate
+    if (lorawan.enable_adaptive_datarate() != LORAWAN_STATUS_OK) {
+        printf("\r\n enable_adaptive_datarate failed! \r\n");
+        return -1;
+    }
+
+    printf("\r\n Adaptive data  rate (ADR) - Enabled \r\n");
+
+    retcode = lorawan.connect();
+
+    if (retcode == LORAWAN_STATUS_OK ||
+            retcode == LORAWAN_STATUS_CONNECT_IN_PROGRESS) {
+    } else {
+        printf("\r\n Connection error, code = %d \r\n", retcode);
+        return -1;
+    }
+
+    printf("\r\n Connection - In Progress ...\r\n");
+
+    // make your event queue dispatching events forever
+    ev_queue.dispatch_forever();
+    queue.dispatch_forever();
+
+    return 0;
+}
+
+
+//static void lora_event_handler(lorawan_event_t event)
+//{
+//    switch (event) {
+//        case CONNECTED:
+//            printf("\r\n Connection - Successful \r\n");
+//            if (MBED_CONF_LORA_DUTY_CYCLE_ON) {
+//                send_message();
+//            } else {
+//                ev_queue.call_every(TX_TIMER, send_message);
+//            }
+//
+//            break;
+//        case DISCONNECTED:
+//            ev_queue.break_dispatch();
+//            printf("\r\n Disconnected Successfully \r\n");
+//            break;
+//        case TX_DONE:
+//            printf("\r\n Message Sent to Network Server \r\n");
+//            if (MBED_CONF_LORA_DUTY_CYCLE_ON) {
+//                send_message();
+//            }
+//            break;
+//        case TX_TIMEOUT:
+//        case TX_ERROR:
+//        case TX_CRYPTO_ERROR:
+//        case TX_SCHEDULING_ERROR:
+//            printf("\r\n Transmission Error - EventCode = %d \r\n", event);
+//            // try again
+//            if (MBED_CONF_LORA_DUTY_CYCLE_ON) {
+//                send_message();
+//            }
+//            break;
+//        case RX_DONE:
+//            printf("\r\n Received message from Network Server \r\n");
+//            receive_message();
+//            break;
+//        case RX_TIMEOUT:
+//        case RX_ERROR:
+//            printf("\r\n Error in reception - Code = %d \r\n", event);
+//            break;
+//        case JOIN_FAILURE:
+//            printf("\r\n OTAA Failed - Check Keys \r\n");
+//            break;
+//        case UPLINK_REQUIRED:
+//            printf("\r\n Uplink required by NS \r\n");
+//            if (MBED_CONF_LORA_DUTY_CYCLE_ON) {
+//                send_message();
+//            }
+//            break;
+//        default:
+//            MBED_ASSERT("Unknown Event");
+//    }
+//}
+
+// EOF
